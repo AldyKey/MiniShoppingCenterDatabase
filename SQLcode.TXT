@@ -1,0 +1,220 @@
+create table kentucky_center (
+	center_id INT,
+	store_id INT primary key,
+	store_name VARCHAR(50),
+	store_description text
+);
+
+--
+--
+--
+
+insert into kentucky_center (center_id, store_id, store_name, store_description)
+values (101, 1, 'Sulpak', 'Store of selling electronics'),
+(101, 2, 'KFC', 'Fast food restaurant'),
+(101, 3, 'Biosfera', 'Pharmacy');
+
+--
+--
+--
+create table sulpak (
+	store_id INT,
+	foreign key (store_id)
+	references kentucky_center (store_id),
+	product_id INT primary key,
+	product_category INT,
+	foreign key (product_category)
+	references sulpak_categories (product_category)
+);
+
+create table sulpak_categories (
+	product_category INT primary key,
+	category_description VARCHAR (20)	
+);
+
+create table sulpak_products (
+	product_id INT,
+	foreign key (product_id)
+	references sulpak (product_id),
+	product_category INT,
+	foreign key (product_category)
+	references sulpak_categories (product_category),
+	name VARCHAR (50),
+	description text,
+	price INT	
+);
+
+alter table sulpak_products
+rename column name to product_name;
+
+--
+--
+--
+
+insert into sulpak_categories (product_category, category_description)
+values (1, 'Telephones'),
+(2, 'Laptops');
+
+insert into sulpak_products (product_id, product_category, name, description, price)
+values (100, 1, 'iPhone 12', 'A brand new iPhone with new features', '900'),
+(101, 1, 'iPhone 12 PRO', 'Like iPhone 12 but with better camera', '1100'),
+(102, 1, 'iPhone 12 PRO MAX', 'Like iPhone 12 Pro but priced much higher', '1200'),
+(103, 2, 'Macbook Pro 13''', 'Intel Core i5, Memory: 128GB', '1200'),
+(104, 2, 'Macbook Pro 15''', 'Intel Core i7, Memory: 256GB', '2000'),
+(105, 2, 'Macbook Pro 13''', 'Intel Core i5, Memory: 256GB', '1700');
+
+insert into sulpak (store_id, product_id, product_category)
+values (1, 100, 1),
+(1, 101, 1),
+(1, 102, 1),
+(1, 103, 2),
+(1, 104, 2),
+(1, 105, 2);
+
+select product_name, description, price as the_cheapest_iphone 
+from sulpak_products
+where price  = (select min(price) FROM sulpak_products where product_category = 1) AND product_category = 1;
+
+select product_name, description, price as the_cheapest_macbook
+from sulpak_products
+where price  = (select min(price) FROM sulpak_products where product_category = 2) AND product_category = 2;
+
+--
+--
+--
+
+create table kfc (
+	store_id INT,
+	foreign key (store_id)
+	references kentucky_center (store_id),
+	product_id INT primary key,
+	product_category INT,
+	foreign key (product_category)
+	references kfc_categories (product_category)
+);
+
+create table kfc_categories (
+	product_category INT primary key,
+	category_description VARCHAR (20)	
+);
+
+create table kfc_menu (
+	product_id INT,
+	foreign key (product_id)
+	references kfc (product_id),
+	product_category INT,
+	foreign key (product_category)
+	references kfc_categories (product_category),
+	name VARCHAR (50),
+	price INT	
+);
+
+alter table kfc_menu
+rename column name to dish_name;
+
+--
+--
+--
+
+insert into kfc_categories (product_category, category_description)
+values (11, 'Burger'),
+(12, 'Drink'),
+(13, 'Set');
+
+insert into kfc (store_id, product_id, product_category)
+values (2, 200, 11),
+(2, 201, 11),
+(2, 202, 12),
+(2, 203, 12),
+(2, 204, 13),
+(2, 205, 13);
+
+insert into kfc_menu (product_id, product_category, name, price)
+values (200, 11, 'Chicken Zinger Burger', 7),
+(201, 11, 'Black Veg Burger', 10),
+(202, 12, 'Pepsi 0.5', 1),
+(203, 12, 'Water 0.5', 1),
+(204, 13, 'Chicken Zinger Burger + Pepsi + Fries', 12),
+(205, 13, 'Black Veg Burger + Waster + Fries', 15);
+
+select dish_name 
+from kfc_menu
+where product_category = 13;
+
+select kfc_categories.product_category, category_description, price
+from kfc_categories
+join kfc_menu on kfc_menu.product_category = kfc_categories.product_category
+order by price ASC;
+
+--
+--
+--
+
+create table pharmacy (
+	store_id INT,
+	foreign key (store_id)
+	references kentucky_center (store_id),
+	product_id INT primary key,
+	product_category INT,
+	foreign key (product_category)
+	references pharmacy_categories (product_category)
+);
+
+create table pharmacy_categories (
+	product_category INT primary key,
+	category_description VARCHAR (20)	
+);
+
+create table pharmacy_products (
+	product_id INT,
+	foreign key (product_id)
+	references pharmacy (product_id),
+	product_category INT,
+	foreign key (product_category)
+	references pharmacy_categories (product_category),
+	name VARCHAR (50),
+	description text,
+	price INT	
+);
+
+alter table pharmacy_products
+rename column name to medicine_name;
+
+--
+--
+--
+
+insert into pharmacy_categories (product_category, category_description)
+values (21, 'Syrup'),
+(22, 'Pills'),
+(23, 'Salve');
+
+insert into pharmacy (store_id, product_id, product_category)
+values (3, 300, 21),
+(3, 301, 21),
+(3, 302, 21),
+(3, 303, 22),
+(3, 304, 22),
+(3, 305, 23);
+
+insert into pharmacy_products (product_id, product_category, name, description, price)
+values (300, 21, 'Optimus Prime', 'Nice syrup from cold', 12),
+(301, 21, 'Ambrobene', 'Good syrup from cough', 8),
+(302, 21, 'Lazolvan', 'Pretty much like ambrobene', 8),
+(303, 22, 'Paracetomol', 'Pills from headache', 2),
+(304, 22, 'Citramon', 'Fever pills', 3),
+(305, 23, 'Bumble Bee', 'Salve for healing skin',10);
+
+select product_id, pharmacy_categories.product_category, category_description, medicine_name, price
+from pharmacy_categories
+join pharmacy_products on pharmacy_categories.product_category = pharmacy_products.product_category
+order by price DESC;
+
+select medicine_name, price
+from pharmacy_products
+join pharmacy_categories on pharmacy_categories.product_category = pharmacy_products.product_category
+where category_description = 'Pills';
+
+--
+--
+--
